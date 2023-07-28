@@ -1,0 +1,5 @@
+# exclude everything
+converted/*
+
+# exception to the rule
+!converted/.gitkeep 

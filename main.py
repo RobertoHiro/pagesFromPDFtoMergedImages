@@ -1,4 +1,5 @@
 from PIL import Image
+from pdf2image import convert_from_path
 import glob
 import os
   
@@ -8,6 +9,7 @@ itensOnTheCollumn = 5
 imagesToMerge = itensOnTheRow * itensOnTheCollumn
 arrayOfRow = []
 arrayOfFiles = []
+pathToPlaceConvertedFiles = "./converted"
 
 stringFileNames = ""
 stringRowNames = ""
@@ -26,12 +28,12 @@ for z in range(int(len(filenames)/imagesToMerge)):
             index += 1
         arrayOfRow.append(row)
         print(stringFileNames)
-        os.system(f'magick convert +append {stringFileNames}row{len(arrayOfRow)}.png')
+        os.system(f'magick convert +append {stringFileNames}{pathToPlaceConvertedFiles}/row{len(arrayOfRow)}.png')
         stringFileNames = ""
-        stringRowNames += f"row{len(arrayOfRow)}.png "
+        stringRowNames += f"{pathToPlaceConvertedFiles}/row{len(arrayOfRow)}.png "
     arrayOfFiles.append(arrayOfRow)
     print(stringRowNames)
-    os.system(f'magick convert -append {stringRowNames}file{len(arrayOfFiles)}.png')
+    os.system(f'magick convert -append {stringRowNames}{pathToPlaceConvertedFiles}/file{len(arrayOfFiles)}.png')
     stringRowNames = ""
 
 # rowIndex = 0
