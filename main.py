@@ -1,11 +1,13 @@
-from PIL import Image
 from pdf2image import convert_from_path
 import glob
 import os
+from tkinter import * 
+from tkinter.filedialog import askdirectory
+from PIL import Image
   
 filenames = []
-itensOnTheRow = 6
-itensOnTheCollumn = 5
+itensOnTheRow = 4
+itensOnTheCollumn = 4
 imagesToMerge = itensOnTheRow * itensOnTheCollumn
 arrayOfRow = []
 arrayOfFiles = []
@@ -13,31 +15,53 @@ pathToPlaceConvertedFiles = "./converted"
 
 stringFileNames = ""
 stringRowNames = ""
+pathname = ""
 
-for filename in glob.glob('C:/Users/RobertoHiroshi/Documents/Projetos/Jasper/tcg_cards/*.png'): #assuming gif
-    im=Image.open(filename)
-    filenames.append(filename)
+def cleanExportFolder():
+    filesToDelete = glob.glob(pathToPlaceConvertedFiles+"/*")
+    for f in filesToDelete:
+        os.remove(f)
 
-index = 0
-for z in range(int(len(filenames)/imagesToMerge)):
-    for x in range(itensOnTheCollumn):
-        row = []
-        for y in range(itensOnTheRow):
-            row.append(filenames[index])
-            stringFileNames += (filenames[index] + " ")
-            index += 1
-        arrayOfRow.append(row)
-        print(stringFileNames)
-        os.system(f'magick convert +append {stringFileNames}{pathToPlaceConvertedFiles}/row{len(arrayOfRow)}.png')
-        stringFileNames = ""
-        stringRowNames += f"{pathToPlaceConvertedFiles}/row{len(arrayOfRow)}.png "
-    arrayOfFiles.append(arrayOfRow)
-    print(stringRowNames)
-    os.system(f'magick convert -append {stringRowNames}{pathToPlaceConvertedFiles}/file{len(arrayOfFiles)}.png')
-    stringRowNames = ""
+def getTargetFolder():
+    Tk().withdraw()
+    global pathname
+    pathname = askdirectory()
 
-# rowIndex = 0
-# fileIndex = 0
-# for z in range(len(arrayOfFiles)):
-#     thisFile = arrayOfFiles[fileIndex]
-#     os.system(f'magick convert +append 1.png 2.png result{rowIndex}.png')
+# def convertPDFtoFiles():
+#   pages = convert_from_path("/tcg_cards.pdf", 500)
+#   for page in pages:
+#       page.save(pathToPlaceConvertedFiles+'/out.png', 'PNG')
+
+def appendFilesToArray():
+    global filenames
+    for filename in glob.glob(pathname+'/*.png'): 
+        im=Image.open(filename)
+        filenames.append(filename)
+
+def createFiles():
+    global filenames, imagesToMerge, itensOnTheCollumn, itensOnTheRow, stringFileNames, pathToPlaceConvertedFiles, arrayOfRow, stringRowNames, arrayOfFiles
+    index = 0
+    for z in range(int(len(filenames)/imagesToMerge)+1):
+        for x in range(itensOnTheCollumn):
+            row = []
+            for y in range(itensOnTheRow):
+                if index < len(filenames):
+                    row.append(filenames[index])
+                    stringFileNames += (filenames[index] + " ")
+                    index += 1
+            arrayOfRow.append(row)
+            os.system(f'magick convert +append {stringFileNames}{pathToPlaceConvertedFiles}/row{len(arrayOfRow)}.png')
+            stringFileNames = ""
+            stringRowNames += f"{pathToPlaceConvertedFiles}/row{len(arrayOfRow)}.png "
+        arrayOfFiles.append(arrayOfRow)
+        print(stringRowNames)
+        os.system(f'magick convert -append {stringRowNames}{pathToPlaceConvertedFiles}/file{len(arrayOfFiles)}.png')
+        stringRowNames = ""
+
+cleanExportFolder()
+
+getTargetFolder()
+
+appendFilesToArray()
+
+createFiles()
